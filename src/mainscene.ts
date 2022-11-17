@@ -1,10 +1,11 @@
 import { ExtendedObject3D, Scene3D, THREE } from 'enable3d';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
-import log from './logger';
 
 // @ts-ignore
 export default class MainScene extends Scene3D {
   audioContext: AudioContext | undefined;
+
+  camera: THREE.PerspectiveCamera;
 
   cameraTarget: THREE.Vector3;
 
@@ -22,6 +23,7 @@ export default class MainScene extends Scene3D {
 
   constructor() {
     super({ key: 'MainScene' });
+    this.camera = new THREE.PerspectiveCamera();
     this.cameraTarget = new THREE.Vector3();
     this.pointerCoords = new THREE.Vector2();
     this.pointerdownRequest = false;
@@ -32,27 +34,26 @@ export default class MainScene extends Scene3D {
   async create() {
     // const { orbitControls: oc } = await this.warpSpeed('-ground', '-light');
 
-    // this.physics.debug?.enable();
+    this.physics.debug?.enable();
 
-    this.cameraTarget = new THREE.Vector3(0, 0, 0);
+    this.cameraTarget = new THREE.Vector3(0, 1.8, 0);
 
     // CAMERA
-    this.camera = new THREE.PerspectiveCamera();
-    this.camera.position.set(0, 6, 10);
+    this.camera.position.set(0, 1.8, 7);
     this.camera.lookAt(this.cameraTarget);
     this.camera.updateProjectionMatrix();
 
     // AMBIENT LIGHT
-    const ambientLight = new THREE.AmbientLight(0x0000ff, 0.35);
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.35);
     this.scene.add(ambientLight);
 
     // DIRECTIONAL LIGHT
     const SHADOW_MAP_SIZE = 2048;
     const SHADOW_FAR = 13500;
     const SHADOW_SIZE = 6;
-    const directionalLight = new THREE.DirectionalLight(0x330000, 0.5);
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
     directionalLight.position.set(8, 10, 4);
-    directionalLight.color.setHSL(0.8, 1, 0.55);
+    directionalLight.color.setHSL(0, 1, 0.98);
     directionalLight.castShadow = true;
     directionalLight.shadow.mapSize.width = SHADOW_MAP_SIZE;
     directionalLight.shadow.mapSize.height = SHADOW_MAP_SIZE;
@@ -63,51 +64,50 @@ export default class MainScene extends Scene3D {
     directionalLight.shadow.camera.far = SHADOW_FAR;
     this.scene.add(directionalLight);
 
+    // ORBIT CONTROLS
     this.orbitControls = new OrbitControls(this.camera, this.renderer.domElement);
+    this.orbitControls.target = this.cameraTarget;
+    this.orbitControls.update();
+    this.orbitControls.saveState();
 
     this.resizeRequest = true;
 
-    const ground = this.physics.add.box(
-      { mass: 0, collisionFlags: 4 },
-      { phong: { opacity: 0.1, transparent: true } },
-    );
+    // const rope = this.physics.add.cylinder({
+    //   height: 2, radiusBottom: 0.05, radiusTop: 0.05, y: 3,
+    // });
+    // const box = this.physics.add.box({
+    //   depth: 1, height: 1, width: 1, y: 1.5,
+    // });
+    // box.body.on.collision((otherObject, event) => {
+    //   if (otherObject.name === 'ball' && otherObject.userData.hasHit === false) {
+    //     // eslint-disable-next-line no-param-reassign
+    //     otherObject.userData.hasHit = true;
+    //     console.log('event', event);
 
-    const rope = this.physics.add.cylinder({
-      height: 2, radiusBottom: 0.05, radiusTop: 0.05, y: 3,
-    });
-    const box = this.physics.add.box({
-      depth: 1, height: 1, width: 1, y: 1.5,
-    });
-    box.body.on.collision((otherObject, event) => {
-      if (otherObject.name === 'ball' && otherObject.userData.hasHit === false) {
-        // eslint-disable-next-line no-param-reassign
-        otherObject.userData.hasHit = true;
-        console.log('event', event);
+    //     if (this.audioContext) {
+    //       const osc = this.audioContext.createOscillator();
+    //       osc.connect(this.audioContext.destination);
+    //       osc.start();
+    //       osc.stop(this.audioContext.currentTime + 0.05);
+    //     }
+    //   }
+    // });
 
-        if (this.audioContext) {
-          const osc = this.audioContext.createOscillator();
-          osc.connect(this.audioContext.destination);
-          osc.start();
-          osc.stop(this.audioContext.currentTime + 0.05);
-        }
-      }
-    });
+    // this.physics.add.constraints.pointToPoint(ground.body, rope.body, {
+    //   pivotA: { y: 4 },
+    //   pivotB: { y: 1 },
+    // });
+    // this.physics.add.constraints.pointToPoint(rope.body, box.body, {
+    //   pivotA: { y: -1 },
+    //   pivotB: { y: 0.5 },
+    // });
 
-    this.physics.add.constraints.pointToPoint(ground.body, rope.body, {
-      pivotA: { y: 4 },
-      pivotB: { y: 1 },
-    });
-    this.physics.add.constraints.pointToPoint(rope.body, box.body, {
-      pivotA: { y: -1 },
-      pivotB: { y: 0.5 },
-    });
-
-    this.orb = this.physics.add.sphere({
-      radius: 3, y: 1.5, mass: 0, collisionFlags: 4,
-    }, { phong: { opacity: 0.3, transparent: true } });
-    this.orb.castShadow = false;
-    this.orb.receiveShadow = false;
-    this.orb.name = 'orb';
+    // this.orb = this.physics.add.sphere({
+    //   radius: 3, y: 1.5, mass: 0, collisionFlags: 4,
+    // }, { phong: { opacity: 0.3, transparent: true } });
+    // this.orb.castShadow = false;
+    // this.orb.receiveShadow = false;
+    // this.orb.name = 'orb';
   }
 
   async init() {
@@ -141,26 +141,27 @@ export default class MainScene extends Scene3D {
 
   processClick() {
     this.pointerdownRequest = false;
-    if (!this.orb || !this.camera) {
-      return;
-    }
-    this.raycaster.setFromCamera(this.pointerCoords, this.camera);
-    const intersects = this.raycaster.intersectObjects([this.orb]);
-    if (intersects.length) {
-      const { x, y, z } = intersects[0].point.clone();
-      const ball = this.physics.add.sphere({
-        x, y, z, radius: 0.4, mass: 0.05, collisionFlags: 0, name: 'ball',
-      });
-      ball.userData.hasHit = false;
-      ball.castShadow = true;
-      ball.receiveShadow = true;
-      ball.body.setFriction(0.5);
-      const vel = this.orb.position.clone();
-      vel.sub(intersects[0].point);
-      vel.multiplyScalar(6);
-      ball.body.setVelocity(vel.x, vel.y, vel.z);
-      log(x.toString());
-    }
+    console.log('click', this.pointerCoords);
+    // if (!this.orb || !this.camera) {
+    //   return;
+    // }
+    // this.raycaster.setFromCamera(this.pointerCoords, this.camera);
+    // const intersects = this.raycaster.intersectObjects([this.orb]);
+    // if (intersects.length) {
+    //   const { x, y, z } = intersects[0].point.clone();
+    //   const ball = this.physics.add.sphere({
+    //     x, y, z, radius: 0.4, mass: 0.05, collisionFlags: 0, name: 'ball',
+    //   });
+    //   ball.userData.hasHit = false;
+    //   ball.castShadow = true;
+    //   ball.receiveShadow = true;
+    //   ball.body.setFriction(0.5);
+    //   const vel = this.orb.position.clone();
+    //   vel.sub(intersects[0].point);
+    //   vel.multiplyScalar(6);
+    //   ball.body.setVelocity(vel.x, vel.y, vel.z);
+    //   log(x.toString());
+    // }
   }
 
   resize() {
@@ -170,14 +171,6 @@ export default class MainScene extends Scene3D {
     if (this.camera) {
       this.camera.aspect = window.innerWidth / window.innerHeight;
       this.camera.updateProjectionMatrix();
-
-      // move camera further back when viewport height increases so objects stay the same size
-      // const scale = 0.01;
-      // const fieldOfView = this.camera.fov * (Math.PI / 180); // convert fov to radians
-      // const targetZ = window.innerHeight / (2 * Math.tan(fieldOfView / 2));
-
-      // this.camera.position.z = targetZ * scale;
-      // this.camera.lookAt(this.cameraTarget);
     }
   }
 
