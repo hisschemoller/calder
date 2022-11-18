@@ -1,5 +1,6 @@
 import { ExtendedObject3D, Scene3D, THREE } from 'enable3d';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import { setupRoom, setupRotor } from './room';
 
 // @ts-ignore
 export default class MainScene extends Scene3D {
@@ -8,8 +9,6 @@ export default class MainScene extends Scene3D {
   camera: THREE.PerspectiveCamera;
 
   cameraTarget: THREE.Vector3;
-
-  orb: ExtendedObject3D | undefined;
 
   orbitControls: OrbitControls | undefined;
 
@@ -20,6 +19,8 @@ export default class MainScene extends Scene3D {
   raycaster: THREE.Raycaster;
 
   resizeRequest: boolean;
+
+  rotor: ExtendedObject3D | undefined;
 
   constructor() {
     super({ key: 'MainScene' });
@@ -71,6 +72,10 @@ export default class MainScene extends Scene3D {
     this.orbitControls.saveState();
 
     this.resizeRequest = true;
+
+    const ground = setupRoom(this);
+    this.rotor = setupRotor(this, ground);
+
 
     // const rope = this.physics.add.cylinder({
     //   height: 2, radiusBottom: 0.05, radiusTop: 0.05, y: 3,
@@ -180,6 +185,12 @@ export default class MainScene extends Scene3D {
     }
     if (this.pointerdownRequest) {
       this.processClick();
+    }
+
+    if (this.rotor) {
+      // this.rotor.
+      // this.rotor.rotation.y += 0.005;
+      // console.log(this.rotor.rotation.y);
     }
   }
 }
