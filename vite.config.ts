@@ -10,7 +10,7 @@ export default defineConfig({
       devOptions: {
         enabled: false,
       },
-      includeAssets: ['struck-icon.svg', 'struck-icon-180.png'],
+      includeAssets: ['calder-icon.svg', 'calder-icon-180.png'],
       manifest: {
         name: 'Calder',
         short_name: 'Calder',
