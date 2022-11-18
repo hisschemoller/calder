@@ -1,33 +1,53 @@
 import { ExtendedGroup, ExtendedObject3D, Scene3D, THREE } from 'enable3d';
 
+const BAR_RADIUS = 0.02;
 const LINE_RADIUS = 0.01;
 const ROOM_HEIGHT = 5;
 const ROTOR_HEIGHT = 0.5;
 const ROTOR_WIDTH = 6;
 
-function createLine(
-  height: number,
+function createBar(
   parent: ExtendedObject3D,
   parentPivot: THREE.Vector3,
   position: THREE.Vector3,
   scene3d: Scene3D,
+  size: number,
+) {
+  const bar = scene3d.add.cylinder({
+    ...position,
+    height: size, radiusBottom: BAR_RADIUS, radiusTop: BAR_RADIUS,
+  });
+  bar.rotation.z = Math.PI / 2;
+  scene3d.physics.add.existing(bar);
+
+  scene3d.physics.add.constraints.pointToPoint(parent.body, bar.body, {
+    pivotA: { ...parentPivot },
+    pivotB: { },
+  });
+
+  return bar;
+}
+
+function createLine(
+  parent: ExtendedObject3D,
+  parentPivot: THREE.Vector3,
+  position: THREE.Vector3,
+  scene3d: Scene3D,
+  size: number,
 ) {
   const line = scene3d.physics.add.cylinder({
-    height, radiusBottom: LINE_RADIUS, radiusTop: LINE_RADIUS,
-    x: position.x,
-    y: position.y,
-    z: position.z,
+    ...position,
+    height: size, radiusBottom: LINE_RADIUS, radiusTop: LINE_RADIUS,
     collisionFlags: 0, mass: 1,
   });
   // line.body.setFriction(0.5);
   // line.body.setDamping(0.9, 0.9);
 
   scene3d.physics.add.constraints.pointToPoint(parent.body, line.body, {
-    pivotA: { x: parentPivot.x, y: parentPivot.y, z: parentPivot.z },
-    pivotB: { y: height / 2 },
+    pivotA: { ...parentPivot },
+    pivotB: { y: size / 2 },
   });
   scene3d.physics.add.existing(line, { collisionFlags: 0, mass: 1 });
-
   return line;
 }
 
@@ -35,35 +55,28 @@ export function setupMobile(scene3d: Scene3D, rotor: ExtendedObject3D) {
   const lineHeight = 2;
 
   const lineLeft = createLine(
-    lineHeight,
     rotor,
     new THREE.Vector3(ROTOR_WIDTH / -2, -ROTOR_HEIGHT, 0),
     new THREE.Vector3(ROTOR_WIDTH / -2, ROOM_HEIGHT - ROTOR_HEIGHT - (lineHeight / 2), 0),
     scene3d,
+    lineHeight,
   );
 
   const lineRight = createLine(
-    lineHeight,
     rotor,
     new THREE.Vector3(ROTOR_WIDTH / 2, -ROTOR_HEIGHT, 0),
     new THREE.Vector3(ROTOR_WIDTH / 2, ROOM_HEIGHT - ROTOR_HEIGHT - (lineHeight / 2), 0),
     scene3d,
+    lineHeight,
   );
 
-  // const lineLeft = scene3d.physics.add.cylinder({
-  //   height: lineHeight, radiusBottom: LINE_RADIUS, radiusTop: LINE_RADIUS,
-  //   x: ROTOR_WIDTH / -2,
-  //   y: ROOM_HEIGHT - ROTOR_HEIGHT - (lineHeight / 2),
-  //   collisionFlags: 0, mass: 1,
-  // });
-  // // lineLeft.body.setFriction(0.5);
-  // // lineLeft.body.setDamping(0.9, 0.9);
-
-  // scene3d.physics.add.constraints.pointToPoint(rotor.body, lineLeft.body, {
-  //   pivotA: { x: ROTOR_WIDTH / -2, y: -ROTOR_HEIGHT },
-  //   pivotB: { y: lineHeight / 2 },
-  // });
-  // scene3d.physics.add.existing(lineLeft, { collisionFlags: 0, mass: 1 });
+  const barLeft = createBar(
+    lineLeft,
+    new THREE.Vector3(0, lineHeight / -2, 0),
+    new THREE.Vector3(lineLeft.position.x, lineLeft.position.y - (lineHeight / 2), 0),
+    scene3d,
+    4,
+  );
 }
 
 export function setupRoom(scene3d: Scene3D) {

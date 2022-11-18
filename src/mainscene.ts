@@ -33,8 +33,6 @@ export default class MainScene extends Scene3D {
   }
 
   async create() {
-    // const { orbitControls: oc } = await this.warpSpeed('-ground', '-light');
-
     this.physics.setGravity(0, -9.8, 0);
     this.physics.debug?.enable();
 
