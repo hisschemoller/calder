@@ -1,6 +1,6 @@
 import { ExtendedObject3D, Scene3D, THREE } from 'enable3d';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
-import { setupRoom, setupRotor } from './room';
+import { setupMobile, setupRoom, setupRotor } from './room';
 
 // @ts-ignore
 export default class MainScene extends Scene3D {
@@ -35,6 +35,7 @@ export default class MainScene extends Scene3D {
   async create() {
     // const { orbitControls: oc } = await this.warpSpeed('-ground', '-light');
 
+    this.physics.setGravity(0, -9.8, 0);
     this.physics.debug?.enable();
 
     this.cameraTarget = new THREE.Vector3(0, 1.8, 0);
@@ -73,9 +74,9 @@ export default class MainScene extends Scene3D {
 
     this.resizeRequest = true;
 
-    const ground = setupRoom(this);
-    this.rotor = setupRotor(this, ground);
-
+    setupRoom(this);
+    this.rotor = setupRotor(this);
+    setupMobile(this, this.rotor);
 
     // const rope = this.physics.add.cylinder({
     //   height: 2, radiusBottom: 0.05, radiusTop: 0.05, y: 3,
