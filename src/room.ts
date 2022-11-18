@@ -46,15 +46,15 @@ export function setupRotor(scene3d: Scene3D, ground: ExtendedObject3D) {
   });
   bar.rotation.z = Math.PI / 2;
   rotor.add(bar);
-  scene3d.physics.add.existing(rotor, { collisionFlags: 0 });
+  scene3d.physics.add.existing(rotor, { collisionFlags: 2, mass: 0 });
 
-  const hinge = scene3d.physics.add.constraints.hinge(ground.body, rotor.body, {
-    pivotA: { y: ROOM_HEIGHT },
-    pivotB: { y: rotorHeight / -2 },
-    axisA: { y: 1 },
-    axisB: { y: 1  },
-  });
-  hinge.enableAngularMotor(true, 0.2, 0.05);
+  // const hinge = scene3d.physics.add.constraints.hinge(ground.body, rotor.body, {
+  //   pivotA: { y: ROOM_HEIGHT },
+  //   pivotB: { y: rotorHeight / -2 },
+  //   axisA: { y: 1 },
+  //   axisB: { y: 1  },
+  // });
+  // hinge.enableAngularMotor(true, 0.2, 0.05);
 
   return rotor;
 }

@@ -188,9 +188,8 @@ export default class MainScene extends Scene3D {
     }
 
     if (this.rotor) {
-      // this.rotor.
-      // this.rotor.rotation.y += 0.005;
-      // console.log(this.rotor.rotation.y);
+      this.rotor.rotation.y += 0.005;
+      this.rotor.body.needUpdate = true
     }
   }
 }
