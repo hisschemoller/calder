@@ -34,7 +34,7 @@ export default class MainScene extends Scene3D {
 
   async create() {
     this.physics.setGravity(0, -9.8, 0);
-    this.physics.debug?.enable();
+    // this.physics.debug?.enable();
 
     this.cameraTarget = new THREE.Vector3(0, 1.8, 0);
 
@@ -75,43 +75,6 @@ export default class MainScene extends Scene3D {
     setupRoom(this);
     this.rotor = setupRotor(this);
     setupMobile(this, this.rotor);
-
-    // const rope = this.physics.add.cylinder({
-    //   height: 2, radiusBottom: 0.05, radiusTop: 0.05, y: 3,
-    // });
-    // const box = this.physics.add.box({
-    //   depth: 1, height: 1, width: 1, y: 1.5,
-    // });
-    // box.body.on.collision((otherObject, event) => {
-    //   if (otherObject.name === 'ball' && otherObject.userData.hasHit === false) {
-    //     // eslint-disable-next-line no-param-reassign
-    //     otherObject.userData.hasHit = true;
-    //     console.log('event', event);
-
-    //     if (this.audioContext) {
-    //       const osc = this.audioContext.createOscillator();
-    //       osc.connect(this.audioContext.destination);
-    //       osc.start();
-    //       osc.stop(this.audioContext.currentTime + 0.05);
-    //     }
-    //   }
-    // });
-
-    // this.physics.add.constraints.pointToPoint(ground.body, rope.body, {
-    //   pivotA: { y: 4 },
-    //   pivotB: { y: 1 },
-    // });
-    // this.physics.add.constraints.pointToPoint(rope.body, box.body, {
-    //   pivotA: { y: -1 },
-    //   pivotB: { y: 0.5 },
-    // });
-
-    // this.orb = this.physics.add.sphere({
-    //   radius: 3, y: 1.5, mass: 0, collisionFlags: 4,
-    // }, { phong: { opacity: 0.3, transparent: true } });
-    // this.orb.castShadow = false;
-    // this.orb.receiveShadow = false;
-    // this.orb.name = 'orb';
   }
 
   async init() {
@@ -142,30 +105,15 @@ export default class MainScene extends Scene3D {
       this.resizeRequest = true;
     });
   }
+  
+  preload() {
+    this.load.svg('svg/calder1.svg');
+    // this.load.preload
+  }
 
   processClick() {
     this.pointerdownRequest = false;
     console.log('click', this.pointerCoords);
-    // if (!this.orb || !this.camera) {
-    //   return;
-    // }
-    // this.raycaster.setFromCamera(this.pointerCoords, this.camera);
-    // const intersects = this.raycaster.intersectObjects([this.orb]);
-    // if (intersects.length) {
-    //   const { x, y, z } = intersects[0].point.clone();
-    //   const ball = this.physics.add.sphere({
-    //     x, y, z, radius: 0.4, mass: 0.05, collisionFlags: 0, name: 'ball',
-    //   });
-    //   ball.userData.hasHit = false;
-    //   ball.castShadow = true;
-    //   ball.receiveShadow = true;
-    //   ball.body.setFriction(0.5);
-    //   const vel = this.orb.position.clone();
-    //   vel.sub(intersects[0].point);
-    //   vel.multiplyScalar(6);
-    //   ball.body.setVelocity(vel.x, vel.y, vel.z);
-    //   log(x.toString());
-    // }
   }
 
   resize() {

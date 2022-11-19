@@ -1,4 +1,5 @@
 import { ExtendedGroup, ExtendedObject3D, Scene3D, THREE } from 'enable3d';
+import { createSVG } from './actor-mesh';
 
 const BAR_RADIUS = 0.02;
 const LINE_RADIUS = 0.01;
@@ -47,8 +48,33 @@ function createLine(
     pivotA: { ...parentPivot },
     pivotB: { y: size / 2 },
   });
-  scene3d.physics.add.existing(line, { collisionFlags: 0, mass: 1 });
   return line;
+}
+
+/**
+ * SVG extrude registration point is at bounding box left top.
+ * @param scene3d 
+ * @param svgUrl 
+ */
+async function createShape(
+  parent: ExtendedObject3D,
+  parentPivot: THREE.Vector3,
+  position: THREE.Vector3,
+  scene3d: Scene3D,
+  svgUrl: string,
+) {
+  const shape = await createSVG(svgUrl, 0.01, undefined, 0.04, 0xff0000) as unknown as ExtendedObject3D;
+  shape.position.add(position);
+  shape.castShadow = true;
+  shape.receiveShadow = true;
+  scene3d.add.existing(shape);
+  scene3d.physics.add.existing(shape, { shape: 'mesh' });
+
+  scene3d.physics.add.constraints.pointToPoint(parent.body, shape.body, {
+    pivotA: { ...parentPivot },
+    pivotB: { },
+  });
+  return shape;
 }
 
 export function setupMobile(scene3d: Scene3D, rotor: ExtendedObject3D) {
@@ -76,6 +102,22 @@ export function setupMobile(scene3d: Scene3D, rotor: ExtendedObject3D) {
     new THREE.Vector3(lineLeft.position.x, lineLeft.position.y - (lineHeight / 2), 0),
     scene3d,
     4,
+  );
+
+  // const barRight = createBar(
+  //   lineRight,
+  //   new THREE.Vector3(0, lineHeight / -2, 0),
+  //   new THREE.Vector3(lineRight.position.x, lineRight.position.y - (lineHeight / 2), 0),
+  //   scene3d,
+  //   4,
+  // );
+
+  createShape(
+    lineRight,
+    new THREE.Vector3(0, lineHeight / -2, 0),
+    new THREE.Vector3(lineRight.position.x - 0.66, lineRight.position.y - (lineHeight / 2), 0),
+    scene3d,
+    'svg/calder1.svg',
   );
 }
 
@@ -112,7 +154,7 @@ export function setupRoom(scene3d: Scene3D) {
 }
 
 export function setupRotor(scene3d: Scene3D) {
-  const rotorRadius = 0.05;
+  const rotorRadius = 0.02;
 
   const rotor = new ExtendedObject3D();
   rotor.position.y = ROOM_HEIGHT;
