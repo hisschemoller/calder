@@ -1,5 +1,6 @@
-import { ExtendedGroup, ExtendedObject3D, Scene3D, THREE } from 'enable3d';
+import { ExtendedObject3D, Scene3D, THREE } from 'enable3d';
 import { createSVG } from './actor-mesh';
+import { createVase } from './vase';
 
 const BAR_RADIUS = 0.02;
 const LINE_RADIUS = 0.01;
@@ -119,6 +120,8 @@ export function setupMobile(scene3d: Scene3D, rotor: ExtendedObject3D) {
     scene3d,
     'svg/calder1.svg',
   );
+
+  createVase(scene3d);
 }
 
 export function setupRoom(scene3d: Scene3D) {

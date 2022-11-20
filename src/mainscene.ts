@@ -34,7 +34,7 @@ export default class MainScene extends Scene3D {
 
   async create() {
     this.physics.setGravity(0, -9.8, 0);
-    // this.physics.debug?.enable();
+    this.physics.debug?.enable();
 
     this.cameraTarget = new THREE.Vector3(0, 1.8, 0);
 
